@@ -53,7 +53,6 @@ void display(void) {
 
 void idle(void) {
 	
-
 	glutPostRedisplay();
 }
 	
@@ -70,12 +69,18 @@ void reshape(int width, int height) {
 	
 }
 void keyboard(unsigned char key, int x, int y) {
-	
+	printf("keyboard:\'%c\'(%#x)\n", key, key);
 	switch (key) {
 	case 0x1b: break;
 	case 'p': audioPlay(); break;
 	case 's': audioStop(); break;
 	}
+	if ((key >= '1') && (key <= '4')) {
+		audioWaveform(key - '1');
+		audioStop();
+		audioPlay();
+	}
+	keys[key] = true;
 }
 void keyboardUp(unsigned char key, int x, int y) {
 	//printf("keyboardUp:\'%c\'(%#x)\n", key, key);
