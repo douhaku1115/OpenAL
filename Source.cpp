@@ -52,7 +52,7 @@ void display(void) {
 };
 
 void idle(void) {
-	
+	audioUpdate();
 	glutPostRedisplay();
 }
 	
@@ -70,12 +70,15 @@ void reshape(int width, int height) {
 }
 void keyboard(unsigned char key, int x, int y) {
 	printf("keyboard:\'%c\'(%#x)\n", key, key);
+	//audioLength(1000);
+	audioDecay(.98);
+
 	switch (key) {
 	case 0x1b: break;
 	case 'p': audioPlay(); break;
 	case 's': audioStop(); break;
 	}
-	if ((key >= '1') && (key <= '4')) {
+	if ((key >= '1') && (key <= '5')) {
 		audioWaveform(key - '1');
 		audioStop();
 		audioPlay();
