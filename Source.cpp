@@ -71,7 +71,9 @@ void reshape(int width, int height) {
 void keyboard(unsigned char key, int x, int y) {
 	printf("keyboard:\'%c\'(%#x)\n", key, key);
 	//audioLength(1000);
-	audioDecay(.98);
+	//audioDecay(.98);
+	audioPitchTarget(4);
+	audioSweep(1.1);
 
 	switch (key) {
 	case 0x1b: break;

@@ -14,6 +14,9 @@ static unsigned int length;
 static unsigned int start;
 static float decay;
 static float gain;
+static float sweep;
+static float pitchTarget;
+static float pitch;
 
 int audioInit() {
 	ALCdevice* device = alcOpenDevice(NULL);// const ALCchar* devicename );
@@ -81,12 +84,24 @@ void audioDecay(float _decay) {
 	decay = _decay;
 
 }
-
+void audioSweep(float _sweep) {
+	sweep = _sweep;
+}
+void audioPitchTarget(float _pitchTarget) {
+	pitchTarget = _pitchTarget;
+}
 void audioPlay() {
 	alSourcef(
 		sid,//ALuint sid,
 		AL_GAIN,//ALenum param, 
 		gain=DEFAULT_GAIN);	//ALfloat value 
+
+	pitch = 1;
+
+	alSourcef(
+		sid,//ALuint sid,
+		AL_PITCH,//ALenum param, 
+		pitch=1);	//ALfloat value 
 
 	alSourcei(
 		sid,//ALuint sid, 
@@ -108,5 +123,21 @@ void audioUpdate() {
 		}*/
 			alSourcef(
 				sid, AL_GAIN, gain *=decay);
+	}
+	if (sweep != 0) {
+		pitch *= sweep;
+		if (pitchTarget != 0) {
+			if (
+				((sweep > 1) && (pitch >= pitchTarget))
+				|| ((sweep < 1) && (pitch <= pitchTarget)) 
+				)
+				audioStop();
+			
+		}
+		alSourcef(
+			sid,//ALuint sid,
+			AL_PITCH,//ALenum param, 
+			pitch);	//ALfloat value 
+
 	}
 }

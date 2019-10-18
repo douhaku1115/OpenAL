@@ -11,6 +11,8 @@ int audioInit();
 void audioWaveform(int _waveform);
 void audioLength(unsigned int mills);
 void audioDecay(float _decay);
+void audioSweep(float _sweep);
+void audioPitchTarget(float _pitchTarget);
 void audioPlay();
 void audioStop();
 void audioUpdate();
