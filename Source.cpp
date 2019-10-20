@@ -72,17 +72,25 @@ void keyboard(unsigned char key, int x, int y) {
 	printf("keyboard:\'%c\'(%#x)\n", key, key);
 	//audioLength(1000);
 	//audioDecay(.98);
-	audioPitchTarget(4);
-	audioSweep(1.1);
+	//audioPitchTarget(4);
+	//audioSweep(1.1);
+	//audioFreq(440/2);
 
 	switch (key) {
 	case 0x1b: break;
 	case 'p': audioPlay(); break;
 	case 's': audioStop(); break;
 	}
-	if ((key >= '1') && (key <= '5')) {
+	/*if ((key >= '1') && (key <= '5')) {
 		audioWaveform(key - '1');
 		audioStop();
+		audioPlay();
+	}*/
+	if ((key >= '0') && (key <= '9')) {
+		audioStop();
+		int  k = key - '0';
+		audioWaveform(AUDIO_WAVEFORM_PULSE_50);
+		audioFreq(440 * powf(2, (1+k/12.f)));
 		audioPlay();
 	}
 	keys[key] = true;

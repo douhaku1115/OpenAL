@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #pragma comment(lib,"OpenAL32.lib")
 #define DEFAULT_GAIN (.1f)
+#define DEFAULT_FREQ (440)
 
 static ALuint sid;
 static int waveform;
@@ -15,8 +16,9 @@ static unsigned int start;
 static float decay;
 static float gain;
 static float sweep;
-static float pitchTarget;
-static float pitch;
+static float freqStart=DEFAULT_FREQ;
+static float freq;
+static float freqEnd;
 
 int audioInit() {
 	ALCdevice* device = alcOpenDevice(NULL);// const ALCchar* devicename );
@@ -46,7 +48,7 @@ int audioInit() {
 		alBufferData(
 			buffers[i], AL_FORMAT_MONO8,	//ALuint bid, ALenum format, 
 			pulse[i],//const ALvoid* data,
-			size, size * 440);//ALsizei size, ALsizei freq );
+			size, size * DEFAULT_FREQ);//ALsizei size, ALsizei freq );
 	}
 	unsigned char triangle[] = {
 		0xff,0xee,0xdd,0xcc,0xbb,0xaa,0x99,0x88,0x77,0x66,0x55,0x44,0x33,0x22,0x11,0x00,
@@ -84,11 +86,12 @@ void audioDecay(float _decay) {
 	decay = _decay;
 
 }
-void audioSweep(float _sweep) {
+void audioSweep(float _sweep,float _freqEnd) {
 	sweep = _sweep;
+	freqEnd = _freqEnd;
 }
-void audioPitchTarget(float _pitchTarget) {
-	pitchTarget = _pitchTarget;
+void audioFreq(float _freq) {
+	freqStart = _freq;
 }
 void audioPlay() {
 	alSourcef(
@@ -96,12 +99,12 @@ void audioPlay() {
 		AL_GAIN,//ALenum param, 
 		gain=DEFAULT_GAIN);	//ALfloat value 
 
-	pitch = 1;
+	freq = freqStart / DEFAULT_FREQ;;
 
 	alSourcef(
 		sid,//ALuint sid,
 		AL_PITCH,//ALenum param, 
-		pitch=1);	//ALfloat value 
+		freq/DEFAULT_FREQ);	//ALfloat value 
 
 	alSourcei(
 		sid,//ALuint sid, 
@@ -125,11 +128,11 @@ void audioUpdate() {
 				sid, AL_GAIN, gain *=decay);
 	}
 	if (sweep != 0) {
-		pitch *= sweep;
-		if (pitchTarget != 0) {
+		freq *= sweep;
+		if (freqEnd != 0) {
 			if (
-				((sweep > 1) && (pitch >= pitchTarget))
-				|| ((sweep < 1) && (pitch <= pitchTarget)) 
+				((sweep > 1) && (freq >= freqEnd))
+				|| ((sweep < 1) && (freq <= freqEnd))
 				)
 				audioStop();
 			
@@ -137,7 +140,7 @@ void audioUpdate() {
 		alSourcef(
 			sid,//ALuint sid,
 			AL_PITCH,//ALenum param, 
-			pitch);	//ALfloat value 
+			freq/DEFAULT_FREQ);	//ALfloat value 
 
 	}
 }
