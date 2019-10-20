@@ -7,7 +7,6 @@
 #pragma comment(lib,"OpenAL32.lib")
 #define DEFAULT_GAIN (.1f)
 #define DEFAULT_FREQ (440)
-
 static ALuint sid;
 static int waveform;
 ALuint buffers[AUDIO_WAVEFORM_PULSE_MAX];
@@ -16,10 +15,9 @@ static unsigned int start;
 static float decay;
 static float gain;
 static float sweep;
-static float freqStart=DEFAULT_FREQ;
-static float freq;
-static float freqEnd;
-
+static float pitchTarget;
+static float pitch;
+static float freq= DEFAULT_FREQ;
 int audioInit() {
 	ALCdevice* device = alcOpenDevice(NULL);// const ALCchar* devicename );
 	if (device == NULL)
@@ -62,18 +60,18 @@ int audioInit() {
 	alGenSources(
 		1,//ALsizei n, 
 		&sid);//ALuint * sources
-	
 
-	
-	
+
+
+
 	alSourcei(
 		sid,//ALuint sid, 
 		AL_LOOPING,//ALenum param, 
 		AL_TRUE);//ALint value
-	
+
 
 	return 0;
-	
+
 }
 void audioWaveform(int _waveform) {
 	waveform = _waveform;
@@ -86,61 +84,64 @@ void audioDecay(float _decay) {
 	decay = _decay;
 
 }
-void audioSweep(float _sweep,float _freqEnd) {
+void audioSweep(float _sweep) {
 	sweep = _sweep;
-	freqEnd = _freqEnd;
+}
+void audioPitchTarget(float _pitchTarget) {
+	pitchTarget = _pitchTarget;
 }
 void audioFreq(float _freq) {
-	freqStart = _freq;
+	freq = _freq;
+
 }
 void audioPlay() {
 	alSourcef(
 		sid,//ALuint sid,
 		AL_GAIN,//ALenum param, 
-		gain=DEFAULT_GAIN);	//ALfloat value 
+		gain = DEFAULT_GAIN);	//ALfloat value 
 
-	freq = freqStart / DEFAULT_FREQ;;
+	pitch = freq/DEFAULT_FREQ;
 
 	alSourcef(
 		sid,//ALuint sid,
 		AL_PITCH,//ALenum param, 
-		freq/DEFAULT_FREQ);	//ALfloat value 
+		pitch );	//ALfloat value 
 
 	alSourcei(
 		sid,//ALuint sid, 
 		AL_BUFFER,//ALenum param, 
 		buffers[waveform]);//ALint value
-	alSourcePlay( sid);
+	alSourcePlay(sid);
 	start = clock();
 }
 void audioStop() {
 	alSourceStop(sid);
 }
 void audioUpdate() {
-	if (((length > 0) && (clock() - start )>= length))
+	if (((length > 0) && (clock() - start) >= length))
 		audioStop();
-	if ((decay!=0)&&(decay < 1)) {
+	if ((decay != 0) && (decay < 1)) {
 		/*gain *= decay;
 		if (gain <= 1.f / 256) {
 			gain = 0;
 		}*/
-			alSourcef(
-				sid, AL_GAIN, gain *=decay);
+		alSourcef(
+			sid, AL_GAIN, gain *= decay);
 	}
 	if (sweep != 0) {
-		freq *= sweep;
-		if (freqEnd != 0) {
+		pitch *= sweep;
+		if (pitchTarget != 0) {
 			if (
-				((sweep > 1) && (freq >= freqEnd))
-				|| ((sweep < 1) && (freq <= freqEnd))
+				((sweep > 1) && (pitch >= pitchTarget))
+				|| ((sweep < 1) && (pitch <= pitchTarget))
 				)
 				audioStop();
-			
+
 		}
 		alSourcef(
 			sid,//ALuint sid,
 			AL_PITCH,//ALenum param, 
-			freq/DEFAULT_FREQ);	//ALfloat value 
+			pitch);	//ALfloat value 
 
 	}
 }
