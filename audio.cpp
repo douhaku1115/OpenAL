@@ -15,9 +15,10 @@ static unsigned int start;
 static float decay;
 static float gain;
 static float sweep;
-static float pitchTarget;
-static float pitch;
-static float freq= DEFAULT_FREQ;
+static float freqStart= DEFAULT_FREQ;
+static float freqEnd;
+static float freq;
+
 int audioInit() {
 	ALCdevice* device = alcOpenDevice(NULL);// const ALCchar* devicename );
 	if (device == NULL)
@@ -84,14 +85,13 @@ void audioDecay(float _decay) {
 	decay = _decay;
 
 }
-void audioSweep(float _sweep) {
+void audioSweep(float _sweep, float _freqEnd ) {
 	sweep = _sweep;
+	freqEnd = _freqEnd;
 }
-void audioPitchTarget(float _pitchTarget) {
-	pitchTarget = _pitchTarget;
-}
+
 void audioFreq(float _freq) {
-	freq = _freq;
+	freqStart = _freq;
 
 }
 void audioPlay() {
@@ -100,12 +100,12 @@ void audioPlay() {
 		AL_GAIN,//ALenum param, 
 		gain = DEFAULT_GAIN);	//ALfloat value 
 
-	pitch = freq/DEFAULT_FREQ;
-
+	freq = freqStart;
+	
 	alSourcef(
 		sid,//ALuint sid,
 		AL_PITCH,//ALenum param, 
-		pitch );	//ALfloat value 
+		freq/DEFAULT_FREQ );	//ALfloat value 
 
 	alSourcei(
 		sid,//ALuint sid, 
@@ -129,11 +129,11 @@ void audioUpdate() {
 			sid, AL_GAIN, gain *= decay);
 	}
 	if (sweep != 0) {
-		pitch *= sweep;
-		if (pitchTarget != 0) {
+		freq *= sweep;
+		if (freqEnd != 0) {
 			if (
-				((sweep > 1) && (pitch >= pitchTarget))
-				|| ((sweep < 1) && (pitch <= pitchTarget))
+				((sweep > 1) && (freq>= freqEnd))
+				|| ((sweep < 1) && (freq <= freqEnd))
 				)
 				audioStop();
 
@@ -141,7 +141,7 @@ void audioUpdate() {
 		alSourcef(
 			sid,//ALuint sid,
 			AL_PITCH,//ALenum param, 
-			pitch);	//ALfloat value 
+			freq/DEFAULT_FREQ);	//ALfloat value 
 
 	}
 }

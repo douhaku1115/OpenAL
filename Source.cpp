@@ -71,15 +71,24 @@ void reshape(int width, int height) {
 void keyboard(unsigned char key, int x, int y) {
 	printf("keyboard:\'%c\'(%#x)\n", key, key);
 	//audioLength(1000);
-	audioDecay(.98);
+	//audioDecay(.98);
 	//audioPitchTarget(4);
 	//audioSweep(1.1);
 	//audioFreq(440*2);
 
 	switch (key) {
-	case 0x1b: break;
-	case 'p': audioPlay(); break;
-	case 's': audioStop(); break;
+	case 0x1b:
+		exit(0); 
+		break;
+	case 'p': 
+		audioFreq(110);
+		audioSweep(1.05,440*2); 
+		audioPlay(); 
+		break;
+		
+	case 's': 
+		audioStop(); 
+		break;
 	}
 	/*if ((key >= '1') && (key <= '5')) {
 		audioWaveform(key - '1');
