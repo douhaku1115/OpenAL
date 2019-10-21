@@ -81,7 +81,7 @@ void keyboard(unsigned char key, int x, int y) {
 		exit(0); 
 		break;
 	case 'p': 
-		audioFreq(110);
+		audioFreq(220);
 		audioSweep(1.05,440*2); 
 		audioPlay(); 
 		break;
