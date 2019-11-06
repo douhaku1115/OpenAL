@@ -1,12 +1,14 @@
+
 #include <stdio.h>
 #include <stdarg.h>
 #include "font.h"
-
+#define FONT GLUT_STROKE_ROMAN
 using namespace glm;
 
-static float weight = 1;
+static float weight=1;
 static vec2 position;
-static float size = FONT_DEFAULT_SIZE;
+static vec2 origin;
+static float height = FONT_DEFAULT_HEIGHT;
 static unsigned char color[3];
 
 void fontBegin() {
@@ -17,8 +19,8 @@ void fontBegin() {
 	glLoadIdentity();
 
 	GLint viewport[4];
-	glGetIntegerv(GL_VIEWPORT, viewport);//GLenum pname, GLint *params);
-
+	glGetIntegerv(GL_VIEWPORT,viewport);//GLenum pname, GLint *params);
+	
 	gluOrtho2D(
 		0,//GLdouble left,
 		viewport[2],//GLdouble right,
@@ -35,18 +37,26 @@ void fontEnd() {
 	glPopAttrib();
 }
 
-void fontSetPosition(float _x, float _y) {
-	position = vec2(_x, _y);
+void fontPosition(float _x, float _y) {
+	origin=position = vec2(_x, _y);
 }
-void fontSetSize(float _size) {
-	size = _size;
+void fontHeight(float _height) {
+	height = _height;
 }
-float fontGetSize() {
-	return size;
+float fontGetHeight() {
+	return height;
 }
+float fontGetWidth(int _character) {
+	return  glutStrokeWidth(
+		FONT,	        //void *font,
+		_character	    //int character);
+	)
+		* height / FONT_DEFAULT_HEIGHT;
+}
+
 float fontGetWeightMin() {
 	GLfloat weight[2];
-	glGetFloatv(GL_LINE_WIDTH_RANGE, weight);//GLenum pname, GLfloat *params)
+	glGetFloatv(GL_LINE_WIDTH_RANGE,weight);//GLenum pname, GLfloat *params)
 	return weight[0];
 }
 float fontGetWeightMax() {
@@ -55,17 +65,20 @@ float fontGetWeightMax() {
 	return weight[1];
 }
 
-void fontSetWeight(float _weight) {
+void fontWeight(float _weight) {
 	weight = _weight;
 
 }
-void fontSetColor(unsigned char _red, unsigned char _green, unsigned char _blue) {
+float fontGetWeight() {
+	return weight;
+}
+/*void fontSetColor(unsigned char _red, unsigned char _green, unsigned char _blue) {
 	color[0] = _red;
 	color[1] = _green;
 	color[2] = _blue;
-}
+}*/
 
-void fontDraw(const char* _format, ...) {
+void fontDraw(const char *_format, ...) {
 	va_list argList;
 	va_start(argList, _format);
 	char str[256];
@@ -73,14 +86,26 @@ void fontDraw(const char* _format, ...) {
 	va_end(argList);
 
 	glLineWidth(weight);//GLfloat width)
-	glColor3ub(color[0], color[1], color[2]);
-	glPushMatrix();
-	{
-		glTranslatef(position.x, position.y + size, 0);
-		glScalef(1, -1, 1);
-		for (char* p = str; *p != '\0'; p++)
-			glutStrokeCharacter(GLUT_STROKE_MONO_ROMAN, *p);
-		//printf("%s\n", str);
+	//glColor3ub(color[0], color[1], color[2]);
+	
+	char* p = str;
+		
+		for (; (*p != '\0') && (*p != '\n'); p++) {
+			glPushMatrix();
+			{
+				glTranslatef(position.x, position.y + height, 0);
+				float s = height / FONT_DEFAULT_HEIGHT;
+				glScalef(s, -s, s);
+				glutStrokeCharacter(FONT, *p);
+				position.x += fontGetWidth(*p);
+			}
+			glPopMatrix();
+		}
+
+	if (*p == '\n') {
+		position.x = origin.x;
+		position.y += height + weight * 2;
+		//glTranslatef(0, height + weight*2, 0);
+		fontDraw(++p);
 	}
-	glPopMatrix();
 }

@@ -47,7 +47,7 @@ int audioInit() {
 		alBufferData(
 			buffers[i], AL_FORMAT_MONO8,	//ALuint bid, ALenum format, 
 			pulse[i],//const ALvoid* data,
-			size, size * DEFAULT_FREQ);//ALsizei size, ALsizei freq );
+			size, size);//ALsizei size, ALsizei freq );
 	}
 	unsigned char triangle[] = {
 		0xff,0xee,0xdd,0xcc,0xbb,0xaa,0x99,0x88,0x77,0x66,0x55,0x44,0x33,0x22,0x11,0x00,
@@ -56,7 +56,7 @@ int audioInit() {
 	alBufferData(
 		buffers[AUDIO_WAVEFORM_TRIANGLE], AL_FORMAT_MONO8,	//ALuint bid, ALenum format, 
 		triangle,//const ALvoid* data,
-		sizeof triangle, sizeof triangle * 440);//ALsizei size, ALsizei freq );
+		sizeof triangle, sizeof triangle);//ALsizei size, ALsizei freq );
 
 	alGenSources(
 		1,//ALsizei n, 
@@ -76,6 +76,10 @@ int audioInit() {
 }
 void audioWaveform(int _waveform) {
 	waveform = _waveform;
+	alSourcei(
+		sid,//ALuint sid, 
+		AL_BUFFER,//ALenum param, 
+		buffers[waveform]);//ALint value
 }
 void audioLength(unsigned int mills) {
 	length = mills;
@@ -92,7 +96,10 @@ void audioSweep(float _sweep, float _freqEnd ) {
 
 void audioFreq(float _freq) {
 	freqStart = _freq;
-
+	alSourcef(
+		sid,//ALuint sid,
+		AL_PITCH,//ALenum param, 
+		freq);	//ALfloat value 
 }
 void audioPlay() {
 	alSourcef(
@@ -102,15 +109,7 @@ void audioPlay() {
 
 	freq = freqStart;
 	
-	alSourcef(
-		sid,//ALuint sid,
-		AL_PITCH,//ALenum param, 
-		freq/DEFAULT_FREQ );	//ALfloat value 
-
-	alSourcei(
-		sid,//ALuint sid, 
-		AL_BUFFER,//ALenum param, 
-		buffers[waveform]);//ALint value
+	
 	alSourcePlay(sid);
 	start = clock();
 }
@@ -141,7 +140,11 @@ void audioUpdate() {
 		alSourcef(
 			sid,//ALuint sid,
 			AL_PITCH,//ALenum param, 
-			freq/DEFAULT_FREQ);	//ALfloat value 
-
+			freq);	//ALfloat value 
+	}
+	ALenum error = alGetError();
+	if (error != AL_NO_ERROR) {
+		printf("%s\n",
+			alGetString(error));
 	}
 }

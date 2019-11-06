@@ -37,13 +37,13 @@ void display(void) {
 
 
 	fontBegin();
-	fontSetColor(0, 0xff, 0);
-	fontSetSize(4);//FONT_DEFAULT_SIZE/40);
-	float lineHeight = 30;
-	float y = windowSize.y - lineHeight * 2;
+	//fontSetColor(0, 0xff, 0);
+	fontHeight(FONT_DEFAULT_HEIGHT);//FONT_DEFAULT_SIZE/40);
+	//float lineHeight = fontGetHeight() * 1.5;
+	//float y = windowSize.y - lineHeight * 2;
 
-	fontSetPosition(0, y);
-	fontSetWeight(fontGetWeightMin());
+	fontPosition(0,0);
+	fontWeight(fontGetWeightMin());
 	//fontDraw("min:%f", fontGetWeightMin());
 
 	fontEnd();
@@ -95,12 +95,22 @@ void keyboard(unsigned char key, int x, int y) {
 		audioStop();
 		audioPlay();
 	}*/
-	if ((key >= '0') && (key <= '9')) {
+	/*if ((key >= '0') && (key <= '4')) {
 		
 		audioStop();
-		float k = key - '0';
-		audioWaveform(AUDIO_WAVEFORM_PULSE_50);
-		audioFreq(440 *powf(2,1+k/12.f));
+		audioWaveform(key - '0');
+		audioFreq(440);
+		audioSweep(.99, 440 / 2);
+		audioPlay();
+	}*/
+	if ((key >= '0') && (key <= '9')) {
+		audioWaveform(AUDIO_WAVEFORM_PULSE_12_5);
+		audioStop();
+		int k = key - '0';
+		audioWaveform(AUDIO_WAVEFORM_PULSE_12_5);
+		audioFreq(440 *pow(2,(1+k/12.f)));
+		//audioSweep(.99, 440 / 2);
+		//audioDecay(.9f);
 		audioPlay();
 	}
 	keys[key] = true;
