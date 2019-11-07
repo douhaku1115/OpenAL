@@ -72,6 +72,21 @@ int audioInit() {
 			noise,//const ALvoid* data,
 			sizeof noise, 1);
 	}
+	{
+		const int len = 93;
+		int shiftReg = 1 << 14;
+		unsigned char noise[len];
+		for (int i = 0; i < len; i++) {
+			int result = (shiftReg ^ (shiftReg >> 6)) & 1;
+			shiftReg >>= 1;
+			shiftReg |= result << 14;
+			noise[i] = 0xff * result;
+		}
+		alBufferData(
+			buffers[AUDIO_WAVEFORM_NOISE_SHORT], AL_FORMAT_MONO8,	//ALuint bid, ALenum format, 
+			noise,//const ALvoid* data,
+			sizeof noise, 1);
+	}
 	alGenSources(
 		1,//ALsizei n, 
 		&sid);//ALuint * sources
