@@ -69,7 +69,7 @@ void display(void) {
 	fontEnd();
 
 	glutSwapBuffers();
-	getchar();
+	//getchar();
 };
 
 void idle(void) {
@@ -102,8 +102,14 @@ void keyboard(unsigned char key, int x, int y) {
 		exit(0); 
 		break;
 	case 'p': 
-		audioFreq(220);
-		audioSweep(1.05,440*2); 
+		audioStop();
+		audioWaveform(AUDIO_WAVEFORM_NOISE_LONG);
+		audioFreq(1789772.5f/
+		202
+			//4
+		);
+		//audioDecay(.9);
+		audioSweep(.9f, 1789772.5f / 4068);
 		audioPlay(); 
 		break;
 		
