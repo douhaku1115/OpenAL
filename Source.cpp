@@ -37,41 +37,18 @@ void display(void) {
 
 
 	fontBegin();
-	//fontSetColor(0, 0xff, 0);
-	fontHeight(FONT_DEFAULT_HEIGHT/2);//FONT_DEFAULT_SIZE/40);
-	fontWeight(fontGetWeightMax()/2);
-	fontPosition(fontGetWeight()*20, fontGetWeight()*20);								  //float lineHeight = fontGetHeight() * 1.5;
-	//float y = windowSize.y - lineHeight * 2;
-	//fontDraw("min:%f", fontGetWeightMin());
-
-
-	const int xorBit = 6;
-	static int shiftReg = 1 << 14;
-	int result = (shiftReg ^ (shiftReg>>xorBit)) & 1;
-	shiftReg >>= 1;
-	shiftReg |= result << 14;
-
-	for (int i = 14; i >= 0; i--) {
-		switch (i) {
-		case 0:glColor3ub(0x00, 0xff, 0x00); break;
-		case xorBit:glColor3ub(0xff, 0x00, 0x00); break;
-		case 14:glColor3ub(0xff, 0xff, 0x00); break;
-		default:glColor3ub(0xff, 0xff, 0xff); break;
-		}
-		fontDraw("%d", (shiftReg >> i) & 1);
-		if (i % 4 == 0) {
-			glColor3ub(0xff, 0xff, 0xff);
-			fontDraw(",");
-		}
+	{
+		fontHeight(FONT_DEFAULT_HEIGHT);//FONT_DEFAULT_SIZE/40);
+		fontWeight(fontGetWeightMax());
+		fontPosition(fontGetWeight() * 20, fontGetWeight() * 20);								  //float lineHeight = fontGetHeight() * 1.5;
+		for (int i = 0; i < 128; i++)
+			if (keys[i])
+				fontDraw("%c\n", i);
 	}
-	glColor3ub(0xff, 0xff, 0x00);
-	fontDraw("\n%d", result);
-	glColor3ub(0xff, 0xff, 0xff);
-	fontDraw("\n%#x(%d)", shiftReg);
 	fontEnd();
 
 	glutSwapBuffers();
-	//getchar();
+
 };
 
 void idle(void) {
@@ -93,6 +70,7 @@ void reshape(int width, int height) {
 }
 void keyboard(unsigned char key, int x, int y) {
 	printf("keyboard:\'%c\'(%#x)\n", key, key);
+	keys[key] = true;
 	//audioLength(1000);
 	//audioDecay(.98);
 	//audioPitchTarget(4);
@@ -101,47 +79,47 @@ void keyboard(unsigned char key, int x, int y) {
 
 	switch (key) {
 	case 0x1b:
-		exit(0); 
+		exit(0);
 		break;
-	case 'p': 
-		audioStop();
-		audioWaveform(AUDIO_WAVEFORM_NOISE_LONG);
-		audioFreq(audioIndexToFreq(15)
-			//4
-		);
-		//audioDecay(.9);
-		//audioSweep(.9f, 1789772.5f / 4068);
-		audioPlay(); 
-		break;
-		
-	case 's': 
-		audioStop(); 
-		break;
+		/*case 'p':
+			audioStop();
+			audioWaveform(AUDIO_WAVEFORM_NOISE_LONG);
+			audioFreq(audioIndexToFreq(15)
+				//4
+			);
+			//audioDecay(.9);
+			//audioSweep(.9f, 1789772.5f / 4068);
+			audioPlay();
+			break;
+
+		case 's':
+			audioStop();
+			break;
+		}*/
+		/*if ((key >= '1') && (key <= '5')) {
+			audioWaveform(key - '1');
+			audioStop();
+			audioPlay();
+		}*/
+		/*if ((key >= '0') && (key <= '4')) {
+
+			audioStop();
+			audioWaveform(key - '0');
+			audioFreq(440);
+			audioSweep(.99, 440 / 2);
+			audioPlay();
+		}*/
+		/*if ((key >= '0') && (key <= '9')) {
+
+			audioStop();
+			int k = key - '0';
+			audioWaveform(AUDIO_WAVEFORM_PULSE_12_5);
+			audioFreq(440 *pow(2,(1+k/12.f)));
+			//audioSweep(.99, 440 / 2);
+			//audioDecay(.9f);
+			audioPlay();
+		}*/
 	}
-	/*if ((key >= '1') && (key <= '5')) {
-		audioWaveform(key - '1');
-		audioStop();
-		audioPlay();
-	}*/
-	/*if ((key >= '0') && (key <= '4')) {
-		
-		audioStop();
-		audioWaveform(key - '0');
-		audioFreq(440);
-		audioSweep(.99, 440 / 2);
-		audioPlay();
-	}*/
-	if ((key >= '0') && (key <= '9')) {
-		
-		audioStop();
-		int k = key - '0';
-		audioWaveform(AUDIO_WAVEFORM_PULSE_12_5);
-		audioFreq(440 *pow(2,(1+k/12.f)));
-		//audioSweep(.99, 440 / 2);
-		//audioDecay(.9f);
-		audioPlay();
-	}
-	keys[key] = true;
 }
 void keyboardUp(unsigned char key, int x, int y) {
 	//printf("keyboardUp:\'%c\'(%#x)\n", key, key);
