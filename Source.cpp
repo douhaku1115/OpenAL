@@ -38,17 +38,38 @@ void display(void) {
 
 	fontBegin();
 	//fontSetColor(0, 0xff, 0);
-	fontHeight(FONT_DEFAULT_HEIGHT);//FONT_DEFAULT_SIZE/40);
-	//float lineHeight = fontGetHeight() * 1.5;
+	fontHeight(FONT_DEFAULT_HEIGHT/2);//FONT_DEFAULT_SIZE/40);
+	fontWeight(fontGetWeightMax()/2);
+	fontPosition(fontGetWeight()*20, fontGetWeight()*20);								  //float lineHeight = fontGetHeight() * 1.5;
 	//float y = windowSize.y - lineHeight * 2;
-
-	fontPosition(0,0);
-	fontWeight(fontGetWeightMin());
 	//fontDraw("min:%f", fontGetWeightMin());
 
+	static int shiftReg = 1 << 14;
+	int result = (shiftReg ^ (shiftReg>>1)) & 1;
+	shiftReg >>= 1;
+	shiftReg |= result << 14;
+
+	for (int i = 14; i >= 0; i--) {
+		switch (i) {
+		case 0:glColor3ub(0x00, 0xff, 0x00); break;
+		case 1:glColor3ub(0xff, 0x00, 0x00); break;
+		case 14:glColor3ub(0xff, 0xff, 0x00); break;
+		default:glColor3ub(0xff, 0xff, 0xff); break;
+		}
+		fontDraw("%d", (shiftReg >> i) & 1);
+		if (i % 4 == 0) {
+			glColor3ub(0xff, 0xff, 0xff);
+			fontDraw(",");
+		}
+	}
+	glColor3ub(0xff, 0xff, 0x00);
+	fontDraw("\n%d", result);
+	glColor3ub(0xff, 0xff, 0xff);
+	fontDraw("\n%#x(%d)", shiftReg);
 	fontEnd();
 
 	glutSwapBuffers();
+	getchar();
 };
 
 void idle(void) {
@@ -104,7 +125,7 @@ void keyboard(unsigned char key, int x, int y) {
 		audioPlay();
 	}*/
 	if ((key >= '0') && (key <= '9')) {
-		audioWaveform(AUDIO_WAVEFORM_PULSE_12_5);
+		
 		audioStop();
 		int k = key - '0';
 		audioWaveform(AUDIO_WAVEFORM_PULSE_12_5);
