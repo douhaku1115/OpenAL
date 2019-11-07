@@ -130,6 +130,11 @@ void audioFreq(float _freq) {
 		AL_PITCH,//ALenum param, 
 		freq);	//ALfloat value 
 }
+float audioIndexToFreq(int _index) {
+	int divisorTable[] = { 4,8,16,32,64,96,128,160,
+		202,254,380,508,762,1016,2034,4068 };
+	return 1789772.5f / divisorTable[_index];
+}
 void audioPlay() {
 	alSourcef(
 		sid,//ALuint sid,

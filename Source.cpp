@@ -105,12 +105,11 @@ void keyboard(unsigned char key, int x, int y) {
 		break;
 	case 'p': 
 		audioStop();
-		audioWaveform(AUDIO_WAVEFORM_NOISE_SHORT);
-		audioFreq(1789772.5f/
-		202
+		audioWaveform(AUDIO_WAVEFORM_NOISE_LONG);
+		audioFreq(audioIndexToFreq(15)
 			//4
 		);
-		audioDecay(.9);
+		//audioDecay(.9);
 		//audioSweep(.9f, 1789772.5f / 4068);
 		audioPlay(); 
 		break;
