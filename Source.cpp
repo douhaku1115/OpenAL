@@ -71,6 +71,28 @@ void reshape(int width, int height) {
 void keyboard(unsigned char key, int x, int y) {
 	printf("keyboard:\'%c\'(%#x)\n", key, key);
 	keys[key] = true;
+
+	if ((key >= '0') && (key <= '3')) {
+		int channel = key - '0';
+		audioStop(channel);
+		switch (channel){
+		
+		case AUDIO_CHANNEL_PULSE0:
+			audioFreq(channel,440 * pow(2, (0 / 12.f)));
+			break;
+		case AUDIO_CHANNEL_PULSE1:
+			audioFreq(channel,440 * pow(2, (0 / 12.f)));
+			break;
+		case AUDIO_CHANNEL_TRIANGLE:
+			audioFreq(channel,440 * pow(2, (0 / 12.f)));
+			break;
+			//AUDIO_CHANNEL_NOISE:
+			}
+
+			
+		audioPlay(channel);
+	}
+
 	//audioLength(1000);
 	//audioDecay(.98);
 	//audioPitchTarget(4);
@@ -124,6 +146,10 @@ void keyboard(unsigned char key, int x, int y) {
 void keyboardUp(unsigned char key, int x, int y) {
 	//printf("keyboardUp:\'%c\'(%#x)\n", key, key);
 	keys[key] = false;
+	if ((key >= '0') && (key <= '3')) {
+		int channel = key - '0';
+		audioStop(channel);
+	}
 }
 
 int main(int argc, char* argv[]) {
