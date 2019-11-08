@@ -5,8 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #pragma comment(lib,"OpenAL32.lib")
-#define DEFAULT_GAIN (.1f)
-#define DEFAULT_FREQ (440)
+
 
 static ALuint sid;
 static int waveform;
@@ -21,6 +20,7 @@ typedef struct {
 	unsigned int length;
 	unsigned int start;
 	float decay;
+	float startGain;
 	float gain;
 	float sweep;
 	float freqStart;
@@ -100,7 +100,7 @@ int audioInit() {
 	}
 
 	for (int i = 0; i < AUDIO_CHANNEL_MAX; i++) {
-
+		audioGain(i,AUDIO_DEFAULT_GAIN);  //‰Šú‰»
 		alGenSources(
 			1,//ALsizei n, 
 			&channels[i].sid);//ALuint * sources
@@ -122,6 +122,14 @@ void audioWaveform(int _channel, int _waveform) {
 		channels[_channel].sid,//ALuint sid, 
 		AL_BUFFER,//ALenum param, 
 		buffers[channels[_channel].waveform]);//ALint value
+}
+void audioGain(int _channel, float _gain) {
+	channels[_channel].gain = channels[_channel].startGain = _gain;
+	alSourcef(
+		channels[_channel].sid,
+		AL_GAIN, 
+		channels[_channel].gain );
+
 }
 void audioLength(int _channel, unsigned int mills) {
 	channels[_channel].length = mills;
@@ -149,10 +157,11 @@ float audioIndexToFreq(int _index) {
 	return 1789772.5f / divisorTable[_index];
 }
 void audioPlay(int _channel) {
+	channels[_channel].gain = channels[_channel].startGain;
 	alSourcef(
 		channels[_channel].sid,//ALuint sid,
 		AL_GAIN,//ALenum param, 
-		channels[_channel].gain = DEFAULT_GAIN);	//ALfloat value 
+		channels[_channel].gain);	//ALfloat value 
 
 	channels[_channel].freq = channels[_channel].freqStart;
 	alSourcef(
@@ -168,8 +177,9 @@ void audioStop(int _channel) {
 }
 void audioUpdate() {
 	for (int i = 0; i < AUDIO_CHANNEL_MAX; i++) {
-		if (((channels[i].length > 0) && (clock() - channels[i].start) >= channels[i].length))
+		if ((channels[i].length > 0) && (clock() - channels[i].start) >= channels[i].length)
 			audioStop(i);
+
 		if ((channels[i].decay != 0) && (channels[i].decay < 1)) {
 			/*gain *= decay;
 			if (gain <= 1.f / 256) {

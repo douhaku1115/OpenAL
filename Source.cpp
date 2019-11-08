@@ -78,15 +78,20 @@ void keyboard(unsigned char key, int x, int y) {
 		switch (channel){
 		
 		case AUDIO_CHANNEL_PULSE0:
+			audioGain(channel, AUDIO_DEFAULT_GAIN);
 			audioFreq(channel,440 * pow(2, (0 / 12.f)));
 			break;
 		case AUDIO_CHANNEL_PULSE1:
+			audioGain(channel, AUDIO_DEFAULT_GAIN*.5);
 			audioFreq(channel,440 * pow(2, (0 / 12.f)));
 			break;
 		case AUDIO_CHANNEL_TRIANGLE:
-			audioFreq(channel,440 * pow(2, (0 / 12.f)));
+			audioGain(channel, AUDIO_DEFAULT_GAIN);
+			audioFreq(channel,440 * pow(2, (3 / 12.f)));
 			break;
-			//AUDIO_CHANNEL_NOISE:
+		case AUDIO_CHANNEL_NOISE:
+			audioDecay(channel,.9f);
+			break;
 			}
 
 			

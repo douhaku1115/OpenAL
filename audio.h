@@ -16,8 +16,12 @@ enum {
 	AUDIO_CHANNEL_NOISE,
 	AUDIO_CHANNEL_MAX
 };
+#define AUDIO_DEFAULT_GAIN (.1f)
+#define AUDIO_DEFAULT_FREQ (440)
+
 int audioInit();
 void audioWaveform(int _channel,int _waveform);
+void audioGain(int _channel, float _gain);
 void audioLength(int _channel, unsigned int mills);
 void audioDecay(int _channel, float _decay);
 void audioSweep(int _channel, float _sweep,float _freqEnd=0);
