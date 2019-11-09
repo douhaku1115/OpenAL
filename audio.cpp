@@ -6,13 +6,9 @@
 #include <stdlib.h>
 #pragma comment(lib,"OpenAL32.lib")
 
-
-static ALuint sid;
-static int waveform;
-ALuint buffers[AUDIO_WAVEFORM_PULSE_MAX];
+static ALuint buffers[AUDIO_WAVEFORM_PULSE_MAX];
 
 //static float freqStart= DEFAULT_FREQ;
-
 
 typedef struct {
 	ALuint sid;
@@ -101,20 +97,28 @@ int audioInit() {
 
 	for (int i = 0; i < AUDIO_CHANNEL_MAX; i++) {
 		audioGain(i,AUDIO_DEFAULT_GAIN);  //‰Šú‰»
+		
 		alGenSources(
 			1,//ALsizei n, 
 			&channels[i].sid);//ALuint * sources
 
 		alSourcei(
-			channels[i].sid,//ALuint sid, 
-			AL_LOOPING,//ALenum param, 
-			AL_TRUE);//ALint value
+			channels[i].sid, //ALuint sid, 
+			AL_LOOPING,      //ALenum param, 
+			AL_TRUE);        //ALint value
 	}
 
+	audioWaveform(AUDIO_CHANNEL_PULSE0, AUDIO_WAVEFORM_PULSE_12_5);
+	audioWaveform(AUDIO_CHANNEL_PULSE1, AUDIO_WAVEFORM_PULSE_12_5);
+	audioWaveform(AUDIO_CHANNEL_TRIANGLE, AUDIO_WAVEFORM_TRIANGLE);
+	audioWaveform(AUDIO_CHANNEL_NOISE, AUDIO_WAVEFORM_NOISE_LONG);
 	
-
+	audioFreq(AUDIO_CHANNEL_PULSE0, AUDIO_DEFAULT_FREQ);
+	audioFreq(AUDIO_CHANNEL_PULSE1, AUDIO_DEFAULT_FREQ);
+	audioFreq(AUDIO_CHANNEL_TRIANGLE, AUDIO_DEFAULT_FREQ);
+	audioFreq(AUDIO_CHANNEL_NOISE, audioIndexToFreq(8));
+		
 		return 0;
-	
 }
 void audioWaveform(int _channel, int _waveform) {
 	channels[_channel].waveform = _waveform;
@@ -159,14 +163,14 @@ float audioIndexToFreq(int _index) {
 void audioPlay(int _channel) {
 	channels[_channel].gain = channels[_channel].startGain;
 	alSourcef(
-		channels[_channel].sid,//ALuint sid,
-		AL_GAIN,//ALenum param, 
+		channels[_channel].sid,     //ALuint sid,
+		AL_GAIN,                    //ALenum param, 
 		channels[_channel].gain);	//ALfloat value 
 
 	channels[_channel].freq = channels[_channel].freqStart;
 	alSourcef(
-		channels[_channel].sid,//ALuint sid,
-		AL_PITCH,//ALenum param, 
+		channels[_channel].sid,   //ALuint sid,
+		AL_PITCH,                 //ALenum param, 
 		channels[_channel].freq );
 	
 	alSourcePlay(channels[_channel].sid);
@@ -186,7 +190,9 @@ void audioUpdate() {
 				gain = 0;
 			}*/
 			alSourcef(
-				channels[i].sid, AL_GAIN, channels[i].gain *= channels[i].decay);
+				channels[i].sid, 
+				AL_GAIN, 
+				channels[i].gain *= channels[i].decay);
 		}
 		if (channels[i].sweep != 0) {
 			channels[i].freq *= channels[i].sweep;
@@ -199,7 +205,7 @@ void audioUpdate() {
 
 			}
 			alSourcef(
-				sid,//ALuint sid,
+				channels[i].sid,//ALuint sid,
 				AL_PITCH,//ALenum param, 
 				channels[i].freq);	//ALfloat value 
 		}

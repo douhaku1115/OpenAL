@@ -24,11 +24,6 @@ void display(void) {
 	glMatrixMode(GL_MODELVIEW);//GLenum mode
 	glLoadIdentity();
 
-
-
-
-
-
 	static float angle;
 	if (keys['d']) angle += 1;
 	if (keys['a']) angle -= 1;
@@ -71,82 +66,37 @@ void reshape(int width, int height) {
 void keyboard(unsigned char key, int x, int y) {
 	printf("keyboard:\'%c\'(%#x)\n", key, key);
 	keys[key] = true;
-
+	
 	if ((key >= '0') && (key <= '3')) {
 		int channel = key - '0';
 		audioStop(channel);
-		switch (channel){
-		
+		switch (channel) {
+
 		case AUDIO_CHANNEL_PULSE0:
 			audioGain(channel, AUDIO_DEFAULT_GAIN);
-			audioFreq(channel,440 * pow(2, (0 / 12.f)));
+			audioFreq(channel, 440 * pow(2, (0 / 12.f)));
 			break;
 		case AUDIO_CHANNEL_PULSE1:
-			audioGain(channel, AUDIO_DEFAULT_GAIN*.5);
-			audioFreq(channel,440 * pow(2, (0 / 12.f)));
+			audioGain(channel, AUDIO_DEFAULT_GAIN * .5);
+			audioFreq(channel, 440 * pow(2, (0 / 12.f)));
 			break;
 		case AUDIO_CHANNEL_TRIANGLE:
 			audioGain(channel, AUDIO_DEFAULT_GAIN);
-			audioFreq(channel,440 * pow(2, (3 / 12.f)));
+			audioFreq(channel, 440 * pow(2, (3 / 12.f)));
 			break;
 		case AUDIO_CHANNEL_NOISE:
-			audioDecay(channel,.9f);
+			audioGain(channel, AUDIO_DEFAULT_GAIN * .5);
+			audioDecay(channel, .9f);
 			break;
-			}
-
-			
+		}
 		audioPlay(channel);
 	}
-
-	//audioLength(1000);
-	//audioDecay(.98);
-	//audioPitchTarget(4);
-	//audioSweep(1.1);
-	//audioFreq(440*2);
-
 	switch (key) {
 	case 0x1b:
 		exit(0);
 		break;
-		/*case 'p':
-			audioStop();
-			audioWaveform(AUDIO_WAVEFORM_NOISE_LONG);
-			audioFreq(audioIndexToFreq(15)
-				//4
-			);
-			//audioDecay(.9);
-			//audioSweep(.9f, 1789772.5f / 4068);
-			audioPlay();
-			break;
-
-		case 's':
-			audioStop();
-			break;
-		}*/
-		/*if ((key >= '1') && (key <= '5')) {
-			audioWaveform(key - '1');
-			audioStop();
-			audioPlay();
-		}*/
-		/*if ((key >= '0') && (key <= '4')) {
-
-			audioStop();
-			audioWaveform(key - '0');
-			audioFreq(440);
-			audioSweep(.99, 440 / 2);
-			audioPlay();
-		}*/
-		/*if ((key >= '0') && (key <= '9')) {
-
-			audioStop();
-			int k = key - '0';
-			audioWaveform(AUDIO_WAVEFORM_PULSE_12_5);
-			audioFreq(440 *pow(2,(1+k/12.f)));
-			//audioSweep(.99, 440 / 2);
-			//audioDecay(.9f);
-			audioPlay();
-		}*/
 	}
+		
 }
 void keyboardUp(unsigned char key, int x, int y) {
 	//printf("keyboardUp:\'%c\'(%#x)\n", key, key);
